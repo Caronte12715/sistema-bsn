@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Administrativo - BSN</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* --- ESTILOS GENERALES --- */
+        :root { --primary: #041A41; --gold: #C88301; --bg-gray: #f2f4f8; --font-stack: 'Montserrat', sans-serif; }
+        body { font-family: var(--font-stack); margin: 0; padding: 0; color: #333; height: 100vh; overflow: hidden; }
+
+        /* LOGIN */
+        #loginScreen { display: flex; width: 100%; height: 100vh; background: white; }
+        .login-left { width: 60%; background-color: var(--primary); position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; z-index: 1; }
+        .login-left::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: url('fondo.png'); background-position: center; background-repeat: no-repeat; background-size: 80%; opacity: 0.1; mix-blend-mode: overlay; z-index: -1; }
+        .login-text-content { z-index: 2; text-align: center; padding: 0 20px; display: flex; flex-direction: column; align-items: center; }
+        .logo-intro { width: 300px; height: auto; margin-bottom: 20px; object-fit: contain; animation: fadeInDown 1s ease-out; }
+        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* CAMBIO AQUI: Fuente reducida */
+        .login-text-content h1 { font-size: 2.4rem; margin: 0; font-weight: 900; color: white; text-transform: uppercase; letter-spacing: 1px; }
+        .login-text-content h2 { font-size: 3rem; font-weight: 700; margin-top: 5px; color: var(--gold); letter-spacing: 2px; text-transform: uppercase; }
+
+        .login-right { width: 40%; background: white; display: flex; align-items: center; justify-content: center; flex-direction: column; position: relative; z-index: 10; }
+        .login-right::before { content: ''; position: absolute; top: 0; bottom: 0; left: -100px; width: 100px; background: linear-gradient(to right, transparent, rgba(255,255,255,0.8), white); pointer-events: none; z-index: 5; }
+        .login-box { width: 340px; text-align: center; position: relative; z-index: 20; }
+        .login-logo-top { display: none !important; }
+        .login-title { color: var(--primary); font-size: 1.1rem; font-weight: 800; margin-bottom: 30px; text-transform: uppercase; letter-spacing: 1px; }
+        .input-group { margin-bottom: 20px; text-align: left; }
+        .input-group label { display: block; font-size: 11px; color: #666; margin-bottom: 6px; font-weight: 800; text-transform: uppercase; }
+        .login-input { width: 100%; padding: 14px; border: 2px solid #f0f0f0; border-radius: 6px; background: #fcfcfc; font-size: 14px; box-sizing: border-box; font-family: var(--font-stack); font-weight: 600; color: var(--primary); }
+        .login-input:focus { border-color: var(--gold); background: white; outline: none; box-shadow: 0 4px 10px rgba(200, 131, 1, 0.1); }
+        .btn-login { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 6px; font-weight: 800; cursor: pointer; margin-top: 15px; transition: 0.3s; letter-spacing: 1px; }
+        .btn-login:hover { background: var(--gold); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(200, 131, 1, 0.3); }
+        .link-text { color: var(--primary); font-size: 0.85em; font-weight: 600; cursor: pointer; margin-top: 25px; display: block; text-decoration: none; }
+        @media (max-width: 900px) { .login-left { display: none; } .login-right { width: 100%; } .login-logo-top { display: inline-block !important; height: 100px; margin-bottom: 25px; object-fit: contain; } }
+
+        /* APP */
+        #appScreen { display: none; height: 100vh; overflow-y: auto; background: var(--bg-gray); }
+        .nav-bar { background: var(--primary); height: 70px; display: flex; justify-content: space-between; align-items: center; padding: 0 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; border-bottom: 4px solid var(--gold); }
+        .nav-brand img { height: 45px; filter: brightness(0) invert(1); }
+        .btn { padding: 9px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: 700; color: white; transition: 0.2s; }
+        .btn:hover { transform: translateY(-1px); } .btn-blue { background: #2c5282; } .btn-green { background: var(--gold); } .btn-red { background: #c53030; } .btn-gray { background: #718096; }
+        .action-buttons-container { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin: 20px 0 30px 0; padding: 0 10px; }
+        .list-container { max-width: 950px; margin: 40px auto; background: white; padding: 35px; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); }
+        .search-box { width: 100%; padding: 14px; border: 2px solid #eee; border-radius: 6px; margin-bottom: 20px; box-sizing: border-box; font-family: var(--font-stack); }
+        .search-box:focus { border-color: var(--primary); outline: none; }
+        .member-row { display: flex; justify-content: space-between; padding: 18px; border-bottom: 1px solid #eee; align-items: center; }
+        .member-row:hover { background: #f9f9f9; }
+        .member-row strong { font-weight: 700; color: var(--primary); font-size: 1.1em; text-transform: uppercase; }
+
+        /* FICHA TÉCNICA */
+        .sheet-container { width: 8.5in; min-height: 11in; background: white; margin: 40px auto; padding: 0.4in; box-shadow: 0 10px 40px rgba(0,0,0,0.15); color: black; box-sizing: border-box; font-family: "Times New Roman", Times, serif; }
+        @media (max-width: 8.5in) { .sheet-container { width: 100%; margin: 10px 0; padding: 15px; box-shadow: none; } }
+        .header-grid { display: grid; grid-template-columns: 130px 1fr 130px; gap: 10px; margin-bottom: 10px; border-bottom: 2px solid #000; padding-bottom: 5px; align-items: center; }
+        .logo-box, .photo-area { width: 100%; height: 140px; display: flex; align-items: center; justify-content: center; }
+        .logo-box img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .header-text { text-align: center; } .header-text h3 { margin: 0; font-size: 9pt; } .header-text h2 { margin: 3px 0; font-size: 15pt; font-weight: 900; text-transform: uppercase; }
+        .box-title { border: 2px solid #000; display: inline-block; padding: 4px 15px; font-weight: bold; font-size: 10pt; margin-top: 8px; background: #fff; }
+        .photo-area { border: 1px solid #000; background: #f8f8f8; cursor: pointer; position: relative; flex-direction: column; overflow: hidden; }
+        .photo-area img { width: 100%; height: 100%; object-fit: cover; position: absolute; top:0; left:0; display:none; }
+        .section-bar { background: #e0e0e0; border: 1px solid #000; text-align: center; font-weight: bold; font-size: 9pt; padding: 3px; margin: 5px 0; text-transform: uppercase; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        .row { display: flex; width: 100%; gap: 8px; margin-bottom: 4px; align-items: flex-end; flex-wrap: wrap; }
+        .f-1 { flex: 1; min-width: 80px; } .f-2 { flex: 2; min-width: 120px; } .f-3 { flex: 3; }
+        label { font-size: 8pt; font-weight: bold; white-space: nowrap; margin-right: 3px; padding-bottom: 1px; }
+        .sheet-input { border: none; border-bottom: 1px solid #000; width: 100%; font-family: 'Courier New', Courier, monospace; font-weight: 700; font-size: 10pt; padding: 0 3px; background: transparent; outline: none; text-transform: uppercase; box-sizing: border-box; height: 18px; }
+        .sheet-input:focus { background: #e6fffa; }
+        select { -webkit-appearance: none; appearance: none; border-radius: 0; }
+
+        .grid-container { display: flex; gap: 5px; margin-top: 5px; }
+        .grid-box { border: 1px solid #000; padding: 5px; flex: 1; font-size: 8pt; }
+        .grid-title { text-align:center; font-weight:bold; border-bottom:1px solid black; margin-bottom:3px; padding-bottom:2px; font-size: 8pt; }
+        .chk-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dotted #ccc; padding: 1px 0; }
+        input[type="checkbox"] { margin: 0; width: 12px; height: 12px; accent-color: var(--gold); cursor: pointer; }
+        .hidden { display: none !important; }
+
+        @media print {
+            @page { size: letter portrait; margin: 0.25in; }
+            .no-print, #loginScreen, .nav-bar, .action-buttons-container { display: none !important; }
+            #appScreen { display: block !important; overflow: visible; height: auto; background: white; }
+            body { background: white; -webkit-print-color-adjust: exact; }
+            .sheet-container { width: 100%; margin: 0; padding: 0; box-shadow: none; border: none; }
+            .header-grid { margin-bottom: 5px; padding-bottom: 2px; }
+            .logo-box, .photo-area { height: 110px; }
+            .section-bar { font-size: 8pt; padding: 2px; margin: 3px 0; }
+            .sheet-input { font-size: 9pt; height: 14px; }
+            .grid-box { padding: 2px; }
+            .chk-row { padding: 0; border-bottom: 1px dotted #aaa; }
+            #photoPlaceholder { display: none !important; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="loginScreen">
+    <div class="login-left">
+        <div class="login-text-content">
+            <img src="fondo.png" class="logo-intro" alt="LLDM" onerror="this.style.display='none'">
+            <h1>Ministerio de Estadística</h1>
+            <h2>BSN</h2>
+        </div>
+    </div>
+    <div class="login-right">
+        <div class="login-box">
+            <div class="login-title">Acceso Administrativo</div>
+            <div class="input-group"> <label>USUARIO</label> <input type="text" id="loginUser" class="login-input"> </div>
+            <div class="input-group"> <label>CONTRASEÑA</label> <input type="password" id="loginPass" class="login-input"> </div>
+            <button class="btn-login" onclick="login()">INGRESAR</button>
+            <div class="link-text" onclick="toggleRegister()">Registrar nuevo usuario</div>
+        </div>
+    </div>
+</div>
+
+<div id="registerScreen" style="display:none; position:fixed; top:0; left:0; width:100%; height:100vh; background:white; align-items:center; justify-content:center; flex-direction:column; z-index: 200;">
+    <div class="login-box">
+        <img src="logo.png" style="height:80px; margin-bottom:15px;" alt="Logo">
+        <h2 style="color:var(--primary); font-weight:800;">Crear Cuenta</h2>
+        <div class="input-group"> <label>NUEVO USUARIO</label> <input type="text" id="regUser" class="login-input"> </div>
+        <div class="input-group"> <label>NUEVA CONTRASEÑA</label> <input type="password" id="regPass" class="login-input"> </div>
+        <button class="btn-login" style="background:var(--gold);" onclick="register()">REGISTRAR</button>
+        <div class="link-text" onclick="toggleRegister()">Cancelar</div>
+    </div>
+</div>
+
+<div id="appScreen">
+    <div class="nav-bar no-print">
+        <div class="nav-brand"><img src="icono.png" alt="LLDM"></div>
+        <div>
+            <button class="btn btn-blue" onclick="showList()">Lista</button>
+            <button class="btn btn-green" onclick="newItem()">+ Nuevo</button>
+            <button class="btn btn-red" onclick="location.reload()">Salir</button>
+        </div>
+    </div>
+
+    <div id="listScreen" class="list-container no-print hidden">
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 3px solid var(--gold); padding-bottom:15px; margin-bottom:20px;">
+            <h3 style="color:var(--primary); margin:0; font-weight:800;">Directorio de Miembros</h3>
+            <span id="loadingIndicator" style="display:none; color:var(--gold); font-weight:bold;"><i class="fas fa-spinner fa-spin"></i> Cargando...</span>
+        </div>
+        <input type="text" id="search" class="search-box" placeholder="🔍 Buscar por nombre..." onkeyup="filterList()">
+        <div id="itemsContainer"></div>
+    </div>
+
+    <div id="formScreen" class="hidden">
+        <div class="no-print action-buttons-container">
+            <button id="btnSave" class="btn btn-blue" onclick="saveData()"><i class="fas fa-save"></i> GUARDAR</button>
+            <button class="btn btn-blue" onclick="window.print()"><i class="fas fa-print"></i> IMPRIMIR</button>
+            <button class="btn btn-red" onclick="deleteItem()"><i class="fas fa-trash"></i> ELIMINAR</button>
+            <button class="btn btn-gray" onclick="showList()"><i class="fas fa-times"></i> CERRAR</button>
+        </div>
+
+        <form id="mainForm" class="sheet-container">
+            <input type="hidden" name="ID" id="field_ID">
+            <input type="hidden" name="Foto_URL">
+
+            <div class="header-grid">
+                <div class="logo-box"><img src="logo.png" alt="Escudo"></div>
+                <div class="header-text">
+                    <h3>Iglesia del Dios Vivo Columna y Apoyo de la Verdad</h3>
+                    <h2 class="header-title">LA LUZ DEL MUNDO A.R.</h2>
+                    <h3 class="header-subtitle">Ministerio de Coordinación de Estadística</h3>
+                    <h3 class="header-subtitle">Jurisdicción de El Salvador</h3>
+                    <div class="box-title">REGISTRO PERSONAL DE MIEMBROS</div>
+                </div>
+                <div class="photo-area" onclick="document.getElementById('fileInput').click()">
+                    <img id="previewImg">
+                    <div id="photoPlaceholder" style="font-size:9px; color:#666; text-align:center;"><i class="fas fa-camera fa-2x"></i><br>SUBIR FOTO</div>
+                    <input type="file" id="fileInput" class="hidden" accept="image/*" onchange="handlePhoto()">
+                </div>
+            </div>
+
+            <div class="row"><div class="f-1"><label>IGLESIA:</label><input name="Iglesia" value="MCEI" class="sheet-input"></div><div class="f-1"><label>CLAVE:</label><input name="Clave" class="sheet-input"></div></div>
+
+            <div class="section-bar">DATOS GENERALES</div>
+            <div class="row"><div class="f-1"><label>1er Apellido:</label><input name="Primer_Apellido" class="sheet-input"></div><div class="f-1"><label>2do Apellido:</label><input name="Segundo_Apellido" class="sheet-input"></div><div class="f-1"><label>Casada:</label><input name="Casada_Apellido" class="sheet-input"></div></div>
+            <div class="row"><div class="f-1"><label>1er Nombre:</label><input name="Primer_Nombre" class="sheet-input"></div><div class="f-1"><label>2do Nombre:</label><input name="Segundo_Nombre" class="sheet-input"></div><div class="f-1"><label>Conocido:</label><input name="Conocido_Por" class="sheet-input"></div></div>
+            <div class="row"><div class="f-1"><label>DIRECCIÓN:</label><input name="Direccion" class="sheet-input"></div></div>
+            <div class="row"><div class="f-1"><label>Tel:</label><input name="Telefono" class="sheet-input"></div><div class="f-1"><label>Civil:</label><select name="Estado_Civil" class="sheet-input"><option></option><option>Soltero</option><option>Casado</option><option>Viudo</option></select></div><div class="f-2"><label>Email:</label><input name="Email" class="sheet-input" style="text-transform:lowercase"></div></div>
+
+            <div style="border:1px solid black; padding:5px; margin:5px 0;">
+                <div style="text-align:center; font-weight:bold; border-bottom:1px solid black; padding-bottom:3px; font-size:9pt;">LUGAR Y FECHA DE NACIMIENTO</div>
+                <div class="row" style="margin-top:5px;"><div class="f-1"><label>Muni:</label><input name="Lugar_Nac_Muni" class="sheet-input"></div><div class="f-1"><label>Depto:</label><input name="Lugar_Nac_Depto" class="sheet-input"></div><div class="f-1"><label>País:</label><input name="Lugar_Nac_Pais" class="sheet-input"></div></div>
+                <div class="row"><div class="f-1"><label>Fecha:</label><input type="date" name="Fecha_Nacimiento" class="sheet-input"></div><div class="f-1" style="display:flex; align-items:center; justify-content: flex-end;"><label>Extranjero:</label><input type="checkbox" name="Extranjero"></div></div>
+            </div>
+
+            <div class="row"><div class="f-1"><label>Estudios:</label><input name="Grado_Estudio" class="sheet-input"></div><div class="f-1"><label>Profesión:</label><input name="Profesion" class="sheet-input"></div><div class="f-1"><label>DUI:</label><input name="DUI_Pasaporte" class="sheet-input"></div></div>
+
+            <div class="row">
+                <div class="f-2"><label>Casado en Iglesia de:</label><input name="Casado_Iglesia_De" class="sheet-input"></div>
+                <div class="f-1"><label>Fecha:</label><input type="date" name="Fecha_Boda" class="sheet-input"></div>
+                <div class="f-1"><label>Ofició:</label><input name="Oficio_Boda" class="sheet-input"></div>
+            </div>
+            <div class="row"><div class="f-1"><label>Conyugue:</label><input name="Nombre_Conyuge" class="sheet-input"></div></div>
+            <div class="row"><div class="f-1"><label>Hijos:</label><input name="Hijos" class="sheet-input"></div></div>
+
+            <div class="section-bar">DATOS ESPIRITUALES</div>
+            <div class="row" style="align-items: flex-start;">
+                <div class="f-1" style="border-right:1px solid black; padding-right:5px;">
+                    <div style="text-align:center; font-weight:bold; font-size:9pt; margin-bottom:5px;">BAUTISMO EN AGUA</div>
+                    <div class="row" style="justify-content: space-around; margin-bottom:8px;">
+                        <label style="cursor:pointer;"><input type="checkbox" name="Descendencia" onclick="if(this.checked) document.getElementById('chkConv').checked=false;"> Descendencia</label>
+                        <label style="cursor:pointer;"><input type="checkbox" id="chkConv" onclick="if(this.checked) document.getElementsByName('Descendencia')[0].checked=false;"> Conversión</label>
+                    </div>
+                    <div class="row"><label>Fecha:</label><input type="date" name="Bautismo_Agua_Fecha" class="sheet-input"></div>
+                    <div class="row"><label>Lugar:</label><input name="Bautismo_Agua_Lugar" class="sheet-input"></div>
+                    <div class="row"><label>Ofició:</label><input name="Bautismo_Agua_Oficio" class="sheet-input"></div>
+                </div>
+
+                <div class="f-1" style="padding-left:5px;">
+                    <div style="text-align:center; font-weight:bold; font-size:9pt; margin-bottom:5px;">BAUTISMO EN ESPÍRITU SANTO</div>
+                    <div class="row" style="margin-top:20px;"><label>Fecha:</label><input type="date" name="Bautismo_Espiritu_Fecha" class="sheet-input"></div>
+                    <div class="row" style="margin-top:10px;"><label>Lugar:</label><input name="Conversion_Lugar" class="sheet-input"></div>
+                    <div class="row"><label>Testificó:</label><input name="Conversion_Testifico" class="sheet-input"></div>
+                    <div class="row"><label>Encargado:</label><input name="Conversion_Encargado" class="sheet-input"></div>
+                </div>
+            </div>
+
+            <div style="border-top:1px solid black; margin-top:5px; padding-top:5px;">
+                <div class="row"><label>Fecha Conversión:</label><input type="date" name="Conversion_Fecha" class="sheet-input" style="width:150px;"> <label style="margin-left:15px;">Descendencia (Notas):</label><input name="Descendencia" class="sheet-input" style="flex:1;"></div>
+            </div>
+
+            <div class="grid-container">
+                <div class="grid-box">
+                    <div class="grid-title">GRUPO</div>
+                    <div class="chk-row">Pertenece a:<input name="Grupo_Pertenece" class="sheet-input" style="width:50px;"></div>
+                    <div class="chk-row">Es Joven:<input type="checkbox" name="Es_Joven"></div>
+                    <div class="chk-row">Casados:<input type="checkbox" name="Status_Casados"></div>
+                    <div class="chk-row">Solos:<input type="checkbox" name="Status_Solos"></div>
+                </div>
+                <div class="grid-box">
+                    <div class="grid-title">ALTA / BAJA</div>
+                    <div class="chk-row">Alta:<input type="checkbox" name="Status_Alta"></div>
+                    <div class="chk-row">Baja:<input type="checkbox" name="Status_Baja"></div>
+                    <div class="chk-row">Bautismo:<input type="checkbox" name="Status_Bautismo"></div>
+                    <div class="chk-row">Carta:<input type="checkbox" name="Status_Carta"></div>
+                    <div class="chk-row">Restaurado:<input type="checkbox" name="Status_Restaurado"></div>
+                    <div class="chk-row">Trasladado:<input type="checkbox" name="Status_Trasladado"></div>
+                    <div class="chk-row">Defunción:<input type="checkbox" name="Status_Defuncion"></div>
+                    <div class="chk-row">Retirado:<input type="checkbox" name="Status_Retirado"></div>
+                </div>
+                <div class="grid-box" style="flex:1.5;">
+                    <div class="grid-title">ACTIVIDADES</div>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px;">
+                        <div>
+                            <div class="chk-row">Fidelidad:<input type="checkbox" name="Act_Fidelidad"></div>
+                            <div class="chk-row">Conducta:<input type="checkbox" name="Act_Conducta"></div>
+                            <div class="chk-row">Obediencia:<input type="checkbox" name="Act_Obediencia"></div>
+                            <div class="chk-row">Preside:<input type="checkbox" name="Act_Preside"></div>
+                            <div class="chk-row">Servicio:<input type="checkbox" name="Act_Servicio"></div>
+                            <div class="chk-row">Dominicales:<input type="checkbox" name="Act_Dominical"></div>
+                            <div class="chk-row">Ayuda:<input type="checkbox" name="Act_Ayuda"></div>
+                        </div>
+                        <div>
+                            <div class="chk-row">Coro:<input type="checkbox" name="Act_Coro"></div>
+                            <div class="chk-row">Grupo:<input type="checkbox" name="Act_Grupo"></div>
+                            <div class="chk-row">Obra:<input type="checkbox" name="Act_Obra"></div>
+                            <div class="chk-row">Diezmos:<input type="checkbox" name="Act_Diezmos"></div>
+                            <div class="chk-row">Ofrendas:<input type="checkbox" name="Act_Ofrendas"></div>
+                            <div class="chk-row">Cooperación:<input type="checkbox" name="Act_Cooperacion"></div>
+                            <div class="chk-row">Vigilancia:<input type="checkbox" name="Act_Vigilancia"></div>
+                        </div>
+                    </div>
+                    <div class="chk-row">Construcción:<input type="checkbox" name="Act_Construccion"></div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    const API_URL = 'https://script.google.com/macros/s/AKfycbzSyKBSzBOkVwXaroTG5brA55gqtX0IiqngOBjKBvqOQFKrkUm9mV7Frl0IGm3gzH4/exec';
+
+    let members = [];
+    let isLoading = false;
+
+    document.getElementById("loginPass").addEventListener("keypress", function(e) {
+        if (e.key === "Enter") login();
+    });
+
+    function toggleRegister() {
+        const loginDiv = document.getElementById('loginScreen');
+        const regDiv = document.getElementById('registerScreen');
+        if (loginDiv.style.display === 'none') {
+            loginDiv.style.display = 'flex'; regDiv.style.display = 'none';
+        } else {
+            loginDiv.style.display = 'none'; regDiv.style.display = 'flex';
+        }
+    }
+
+    function login() {
+        const u = document.getElementById('loginUser').value;
+        const p = document.getElementById('loginPass').value;
+        if(!u || !p) { alert("Ingresa datos"); return; }
+        const btn = document.querySelector('.btn-login');
+        btn.innerText = "Verificando..."; btn.disabled = true;
+        fetch(API_URL, { method: 'POST', body: new URLSearchParams({action:'login', user: u, pass: p}) })
+        .then(r => r.json()).then(d => {
+            if(d.result === 'success') {
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('appScreen').style.display = 'block';
+                fetchMembers();
+            } else { alert("Error: " + d.message); }
+        }).finally(() => { btn.innerText = "INGRESAR"; btn.disabled = false; });
+    }
+
+    function register() {
+        const user = document.getElementById('regUser').value;
+        const pass = document.getElementById('regPass').value;
+        if(!user || !pass) { alert("Completa todos los campos"); return; }
+        fetch(API_URL, { method: 'POST', body: new URLSearchParams({action:'register', user: user, pass: pass}) })
+        .then(r => r.json()).then(d => {
+            if(d.result === 'success') { alert("Usuario creado"); toggleRegister(); }
+            else { alert(d.message); }
+        });
+    }
+
+    function fetchMembers() {
+        if(isLoading) return;
+        isLoading = true;
+        const indicator = document.getElementById('loadingIndicator');
+        if(indicator) indicator.style.display = 'inline-block';
+        fetch(API_URL, {method:'POST', body: new URLSearchParams({action:'readAll'})})
+        .then(r => r.json()).then(d => {
+            members = d.data;
+            renderList(members);
+            document.getElementById('listScreen').classList.remove('hidden');
+        })
+        .finally(() => {
+             isLoading = false;
+             if(indicator) indicator.style.display = 'none';
+        });
+    }
+
+    function renderList(data) {
+        const c = document.getElementById('itemsContainer');
+        c.innerHTML = '';
+        if(!data || data.length === 0) {
+            c.innerHTML = '<div style="text-align:center; padding:20px; color:#666;">No hay registros encontrados</div>';
+            return;
+        }
+        const validData = data.filter(m => (m.Primer_Nombre && m.Primer_Nombre.trim() !== "") || (m.Primer_Apellido && m.Primer_Apellido.trim() !== ""));
+        const vistos = new Set();
+        const unicos = validData.filter(m => {
+            const idUnico = (m.Primer_Nombre + m.Primer_Apellido + (m.Segundo_Apellido||"")).toLowerCase().replace(/\s/g, '');
+            if (vistos.has(idUnico)) return false;
+            vistos.add(idUnico);
+            return true;
+        });
+        const listHTML = unicos.map(m => `
+            <div class="member-row">
+                <div>
+                    <strong>${m.Primer_Apellido||''} ${m.Segundo_Apellido||''}, ${m.Primer_Nombre||''} ${m.Segundo_Nombre||''}</strong><br>
+                    <small style="color:#666"><i class="fas fa-id-card"></i> ${m.DUI_Pasaporte||'Sin Documento'}</small>
+                </div>
+                <button class="btn btn-blue" onclick='loadMember(${JSON.stringify(m).replace(/'/g, "'")})'>
+                    <i class="fas fa-folder-open"></i> Abrir
+                </button>
+            </div>
+        `).join('');
+        c.innerHTML = listHTML;
+    }
+
+    function showList() {
+        if(isLoading) return;
+        document.getElementById('listScreen').classList.remove('hidden');
+        document.getElementById('formScreen').classList.add('hidden');
+        fetchMembers();
+    }
+
+    function newItem() {
+        document.getElementById('mainForm').reset();
+        document.getElementById('field_ID').value = "";
+        resetPhoto();
+        document.getElementById('listScreen').classList.add('hidden');
+        document.getElementById('formScreen').classList.remove('hidden');
+    }
+
+    function formatDriveUrl(url) {
+        if (!url) return "";
+        let id = "";
+        if (url.includes("id=")) { let match = url.match(/id=([a-zA-Z0-9_-]+)/); if (match && match[1]) id = match[1]; }
+        else if (url.includes("/d/")) { let match = url.match(/\/d\/([a-zA-Z0-9_-]+)/); if (match && match[1]) id = match[1]; }
+        if (id) return `https://lh3.googleusercontent.com/d/${id}=s400`;
+        return "";
+    }
+
+    function loadMember(m) {
+        newItem();
+        const form = document.getElementById('mainForm');
+        if(m.ID) document.getElementById('field_ID').value = m.ID;
+
+        if(document.getElementById('chkConv')) document.getElementById('chkConv').checked = false;
+
+        Object.keys(m).forEach(key => {
+            if(form.elements[key]) {
+                const el = form.elements[key];
+                if(el.type === 'checkbox') el.checked = (m[key] === true || m[key] === 'TRUE');
+                else if(key.includes('Fecha') || key.includes('Boda')) {
+                    try {
+                        let dateVal = new Date(m[key]);
+                        if(!isNaN(dateVal)) el.value = dateVal.toISOString().split('T')[0];
+                        else el.value = m[key];
+                    } catch(e){ el.value = m[key]; }
+                }
+                else el.value = m[key];
+            }
+        });
+
+        if(form.elements['Descendencia'] && !form.elements['Descendencia'].checked) {
+             if(document.getElementById('chkConv')) document.getElementById('chkConv').checked = true;
+        }
+
+        const preview = document.getElementById('previewImg');
+        const placeholder = document.getElementById('photoPlaceholder');
+        preview.style.display = 'none'; placeholder.style.display = 'flex';
+
+        if(m.Foto_URL && m.Foto_URL.length > 10) {
+            const finalUrl = formatDriveUrl(m.Foto_URL);
+            if (finalUrl) {
+                preview.src = finalUrl;
+                preview.onload = function() { preview.style.display = 'block'; placeholder.style.display = 'none'; };
+                preview.onerror = function() { preview.style.display = 'none'; placeholder.style.display = 'flex'; };
+            }
+        }
+    }
+
+    function saveData() {
+        const btn = document.getElementById('btnSave');
+        if(btn.disabled) return;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> GUARDANDO...';
+        btn.disabled = true;
+        const form = document.getElementById('mainForm');
+        const data = Object.fromEntries(new FormData(form));
+        data.ID = document.getElementById('field_ID').value;
+        form.querySelectorAll('input[type="checkbox"]').forEach(ck => data[ck.name] = ck.checked ? "TRUE" : "FALSE");
+        const file = document.getElementById('fileInput').files[0];
+        const send = (payload) => {
+            fetch(API_URL, {method: 'POST', body: new URLSearchParams({action:'save', data:JSON.stringify(payload)})})
+            .then(r => r.json()).then(d => {
+                if(d.result === 'success') {
+                    document.getElementById('field_ID').value = d.id;
+                    alert("✅ DATOS GUARDADOS CORRECTAMENTE");
+                } else { alert("Error: " + d.error); }
+            })
+            .catch(e => alert("Error de conexión"))
+            .finally(() => { btn.innerHTML = '<i class="fas fa-save"></i> GUARDAR'; btn.disabled = false; });
+        };
+        if(file) {
+            const reader = new FileReader();
+            reader.onload = e => { data.photoBase64 = e.target.result; data.photoMimeType = file.type; send(data); };
+            reader.readAsDataURL(file);
+        } else { send(data); }
+    }
+
+    function deleteItem() {
+        const id = document.getElementById('field_ID').value;
+        if(!id) { alert("Registro no guardado."); return; }
+        if(confirm("⚠ ¿ESTÁS SEGURO DE ELIMINAR ESTA FICHA?")) {
+            fetch(API_URL, {method:'POST', body: new URLSearchParams({action:'delete', id: id})})
+            .then(() => { alert("🗑 Ficha Eliminada"); showList(); });
+        }
+    }
+
+    function handlePhoto() {
+        const file = document.getElementById('fileInput').files[0];
+        if(file) {
+            const reader = new FileReader();
+            reader.onload = e => {
+                const img = document.getElementById('previewImg');
+                img.src = e.target.result;
+                img.style.display = 'block';
+                document.getElementById('photoPlaceholder').style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function resetPhoto() {
+        document.getElementById('previewImg').src = "";
+        document.getElementById('previewImg').style.display = 'none';
+        document.getElementById('photoPlaceholder').style.display = 'block';
+    }
+
+    function filterList() {
+        const term = document.getElementById('search').value.toLowerCase();
+        const filtered = members.filter(m => {
+            const fullName = `${m.Primer_Nombre} ${m.Segundo_Nombre} ${m.Primer_Apellido} ${m.Segundo_Apellido}`.toLowerCase();
+            return fullName.includes(term);
+        });
+        renderList(filtered);
+    }
+</script>
+
+</body>
+</html>
